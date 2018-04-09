@@ -76,6 +76,8 @@ func verifyJPG(t *testing.T, img image.Image, goldenPath string) {
 	jpeg.Encode(out, img, &jpeg.Options{Quality: JPG_QUALITY})
 
 	if !bytes.Equal(out.Bytes(), *goldenBytes) {
+		t.Logf("\noutput: %v bytes\n%v", len(out.Bytes()), out.Bytes()[:100])
+		t.Logf("\ngolden: %v bytes \n%v\n", len(*goldenBytes), (*goldenBytes)[:100])
 		t.Error("Merge() did not produce expected output; please verify image manually")
 	}
 }
