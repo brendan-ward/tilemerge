@@ -33,10 +33,11 @@ type Tiles struct {
 // Tile x and y coordinates increase from the upper left of the image.
 // Any tile that
 func Merge(tiles Tiles, xOff, yOff, width, height int, bg color.Color) (image.Image, error) {
-	// TODO: doublecheck that we can draw beyond edge of the width / height
 
 	// TODO: fill with background color.  Is this needed for transparency?
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	img := image.NewRGBA(image.Rect(0, 0,
+		(tiles.X1-tiles.X0+1)*TILE_SIZE,
+		(tiles.Y1-tiles.Y0+1)*TILE_SIZE))
 
 	// tile transform is x = (tile.X - x0) * TILE_SIZE, y = (tile.Y - y) * TILE_SIZE
 	for _, tile := range tiles.Tiles {
@@ -55,5 +56,5 @@ func Merge(tiles Tiles, xOff, yOff, width, height int, bg color.Color) (image.Im
 		draw.Draw(img, image.Rect(x0, y0, x0+TILE_SIZE, y0+TILE_SIZE), src, image.ZP, draw.Src)
 	}
 
-	return img, nil
+	return img.SubImage(image.Rect(xOff, yOff, xOff+width, yOff+height)), nil
 }
