@@ -1,7 +1,7 @@
 package tilemerge
 
 import (
-	"crypto/sha1"
+	"bytes"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -10,7 +10,8 @@ import (
 	"testing"
 )
 
-// TODO: inline image data here instead of in separate files
+const JPG_QUALITY = 90 // used for creating output files
+
 func jpgTiles() Tiles {
 	const z = 1
 	const (
@@ -28,20 +29,33 @@ func jpgTiles() Tiles {
 	i := 0
 	for y := y0; y <= y1; y++ {
 		for x := x0; x <= x1; x++ {
-			data, err := ioutil.ReadFile(fmt.Sprintf("test_data/%v_%v_%v.jpg", z, x, y))
-
-			if err != nil {
-				panic(fmt.Sprintf("Cannot open test data file: test_data/%v_%v_%v.jpg", z, x, y))
-			}
-
 			tiles.Tiles[i] = Tile{
-				Z: z, X: x, Y: y, Data: &data,
+				Z: z, X: x, Y: y, Data: readFile(fmt.Sprintf("test_data/%v_%v_%v.jpg", z, x, y)),
 			}
 
 			i++
 		}
 	}
 	return tiles
+}
+
+// Read file bytes
+func readFile(path string) *[]byte {
+	data, err := ioutil.ReadFile(path)
+
+	if err != nil {
+		panic(err)
+	}
+	return &data
+}
+
+// Read and decode file bytes to image
+func readImage(path string) image.Image {
+	img, _, err := image.Decode(bytes.NewReader(*readFile(path)))
+	if err != nil {
+		panic(err)
+	}
+	return img
 }
 
 // exportJPG exports img to JPG to verify contents manually
@@ -54,11 +68,15 @@ func exportJPG(img image.Image, path string) {
 	jpeg.Encode(out, img, &jpeg.Options{Quality: 90})
 }
 
-// Validate the SHA1 of the image against a trusted SHA1 (image verified by hand)
-func verifySHA1(t *testing.T, img image.Image, expectedSHA1 string) {
-	hash := fmt.Sprintf("%x", sha1.Sum(img.(*image.RGBA).Pix))
-	if hash != expectedSHA1 {
-		t.Errorf("Merge() did not produce expected output; please verify image manually\nSHA1: %v", hash)
+// Compare image to golden image (known good image)
+func verifyJPG(t *testing.T, img image.Image, goldenPath string) {
+	goldenBytes := readFile(goldenPath)
+
+	out := bytes.NewBuffer(nil)
+	jpeg.Encode(out, img, &jpeg.Options{Quality: JPG_QUALITY})
+
+	if !bytes.Equal(out.Bytes(), *goldenBytes) {
+		t.Error("Merge() did not produce expected output; please verify image manually")
 	}
 }
 
@@ -81,10 +99,10 @@ func Test_Merge(t *testing.T) {
 	}
 
 	// verify output manually:
-	// exportJPG(img, "/tmp/test.jpg")
+	// exportJPG(img, "/tmp/test_merge.jpg")
 
 	verifyDimensions(t, img, 2*TILE_SIZE, 2*TILE_SIZE)
-	verifySHA1(t, img, "e588e06e50da01bfd19875d534cf02b1a61bd326")
+	verifyJPG(t, img, "test_data/output/test_merge.jpg")
 }
 
 func Test_Merge_xOff(t *testing.T) {
@@ -103,7 +121,7 @@ func Test_Merge_xOff(t *testing.T) {
 	// exportJPG(img, "/tmp/test_xOff.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "ecba93ff118f4c6a6c96866cb6065accb577dd2e")
+	verifyJPG(t, img, "test_data/output/test_xOff.jpg")
 }
 
 func Test_Merge_yOff(t *testing.T) {
@@ -122,7 +140,7 @@ func Test_Merge_yOff(t *testing.T) {
 	// exportJPG(img, "/tmp/test_yOff.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "b4bb83f0d1aea84d7fc75464645dca7fac430a4f")
+	verifyJPG(t, img, "test_data/output/test_yOff.jpg")
 }
 
 func Test_Merge_xOff_yOff(t *testing.T) {
@@ -142,7 +160,7 @@ func Test_Merge_xOff_yOff(t *testing.T) {
 	// exportJPG(img, "/tmp/test_xOff_yOff.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "8e5aa4d0808f1a74d8e0218172bdd58b2a7490df")
+	verifyJPG(t, img, "test_data/output/test_xOff_yOff.jpg")
 }
 
 func Test_Merge_width(t *testing.T) {
@@ -161,7 +179,7 @@ func Test_Merge_width(t *testing.T) {
 	// exportJPG(img, "/tmp/test_width.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "1891e552955307813f13b8d2b2b396bfb1aba017")
+	verifyJPG(t, img, "test_data/output/test_width.jpg")
 }
 
 func Test_Merge_height(t *testing.T) {
@@ -180,7 +198,7 @@ func Test_Merge_height(t *testing.T) {
 	// exportJPG(img, "/tmp/test_height.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "4f58d201ceae164df7dae77ce0a5ad30fcdd4dcc")
+	verifyJPG(t, img, "test_data/output/test_height.jpg")
 }
 
 func Test_Merge_width_height(t *testing.T) {
@@ -199,7 +217,7 @@ func Test_Merge_width_height(t *testing.T) {
 	// exportJPG(img, "/tmp/test_width_height.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "18b742bbb47c1ecb7a1d4b064e09c9e37865df11")
+	verifyJPG(t, img, "test_data/output/test_width_height.jpg")
 }
 
 func Test_Merge_crop(t *testing.T) {
@@ -218,5 +236,5 @@ func Test_Merge_crop(t *testing.T) {
 	// exportJPG(img, "/tmp/test_crop.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifySHA1(t, img, "c36611d67776eaefae7303c0a36130e612936edb")
+	verifyJPG(t, img, "test_data/output/test_crop.jpg")
 }
