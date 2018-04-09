@@ -56,5 +56,8 @@ func Merge(tiles Tiles, xOff, yOff, width, height int, bg color.Color) (image.Im
 		draw.Draw(img, image.Rect(x0, y0, x0+TILE_SIZE, y0+TILE_SIZE), src, image.ZP, draw.Src)
 	}
 
-	return img.SubImage(image.Rect(xOff, yOff, xOff+width, yOff+height)), nil
+	cropped := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.Draw(cropped, image.Rect(-xOff, -yOff, width, height), img, image.ZP, draw.Src)
+
+	return cropped, nil
 }

@@ -1,8 +1,8 @@
 package tilemerge
 
 import (
+	"crypto/sha1"
 	"fmt"
-	"hash/crc32"
 	"image"
 	"image/jpeg"
 	"io/ioutil"
@@ -54,12 +54,11 @@ func exportJPG(img image.Image, path string) {
 	jpeg.Encode(out, img, &jpeg.Options{Quality: 90})
 }
 
-// Validate the CRC of the image against a trusted CRC (image verified by hand)
-// TODO: this is not returning sufficiently different CRCs to trust it
-func verifyCRC(t *testing.T, img image.Image, expectedCRC uint32) {
-	crc := crc32.ChecksumIEEE(img.(*image.RGBA).Pix)
-	if crc != expectedCRC {
-		t.Errorf("Merge() did not produce expected output; please verify image manually\ncrc: %v", crc)
+// Validate the SHA1 of the image against a trusted SHA1 (image verified by hand)
+func verifySHA1(t *testing.T, img image.Image, expectedSHA1 string) {
+	hash := fmt.Sprintf("%x", sha1.Sum(img.(*image.RGBA).Pix))
+	if hash != expectedSHA1 {
+		t.Errorf("Merge() did not produce expected output; please verify image manually\nSHA1: %v", hash)
 	}
 }
 
@@ -82,10 +81,10 @@ func Test_Merge(t *testing.T) {
 	}
 
 	// verify output manually:
-	exportJPG(img, "/tmp/test.jpg")
+	// exportJPG(img, "/tmp/test.jpg")
 
 	verifyDimensions(t, img, 2*TILE_SIZE, 2*TILE_SIZE)
-	verifyCRC(t, img, 919927081)
+	verifySHA1(t, img, "e588e06e50da01bfd19875d534cf02b1a61bd326")
 }
 
 func Test_Merge_xOff(t *testing.T) {
@@ -104,7 +103,7 @@ func Test_Merge_xOff(t *testing.T) {
 	// exportJPG(img, "/tmp/test_xOff.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 1135162217)
+	verifySHA1(t, img, "ecba93ff118f4c6a6c96866cb6065accb577dd2e")
 }
 
 func Test_Merge_yOff(t *testing.T) {
@@ -123,7 +122,7 @@ func Test_Merge_yOff(t *testing.T) {
 	// exportJPG(img, "/tmp/test_yOff.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 4271688029)
+	verifySHA1(t, img, "b4bb83f0d1aea84d7fc75464645dca7fac430a4f")
 }
 
 func Test_Merge_xOff_yOff(t *testing.T) {
@@ -143,7 +142,7 @@ func Test_Merge_xOff_yOff(t *testing.T) {
 	// exportJPG(img, "/tmp/test_xOff_yOff.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 1934878055)
+	verifySHA1(t, img, "8e5aa4d0808f1a74d8e0218172bdd58b2a7490df")
 }
 
 func Test_Merge_width(t *testing.T) {
@@ -162,7 +161,7 @@ func Test_Merge_width(t *testing.T) {
 	// exportJPG(img, "/tmp/test_width.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 919927081)
+	verifySHA1(t, img, "1891e552955307813f13b8d2b2b396bfb1aba017")
 }
 
 func Test_Merge_height(t *testing.T) {
@@ -181,7 +180,7 @@ func Test_Merge_height(t *testing.T) {
 	// exportJPG(img, "/tmp/test_height.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 919927081)
+	verifySHA1(t, img, "4f58d201ceae164df7dae77ce0a5ad30fcdd4dcc")
 }
 
 func Test_Merge_width_height(t *testing.T) {
@@ -200,7 +199,7 @@ func Test_Merge_width_height(t *testing.T) {
 	// exportJPG(img, "/tmp/test_width_height.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 919927081)
+	verifySHA1(t, img, "18b742bbb47c1ecb7a1d4b064e09c9e37865df11")
 }
 
 func Test_Merge_crop(t *testing.T) {
@@ -219,5 +218,5 @@ func Test_Merge_crop(t *testing.T) {
 	// exportJPG(img, "/tmp/test_crop.jpg")
 
 	verifyDimensions(t, img, width, height)
-	verifyCRC(t, img, 1934878055)
+	verifySHA1(t, img, "c36611d67776eaefae7303c0a36130e612936edb")
 }
