@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/color"
 	"image/jpeg"
 	"io/ioutil"
 	"os"
@@ -248,4 +249,38 @@ func Test_Merge_crop(t *testing.T) {
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_crop.jpg")
+}
+
+func Test_Merge_Missing_Tile(t *testing.T) {
+	tiles := jpgTiles()
+	// remove a tile's data
+	tiles.Tiles[0].Data = nil
+	img, err := Merge(tiles, 0, 0, 2*TILE_SIZE, 2*TILE_SIZE, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	if *update {
+		exportJPG(img, "test_data/output/test_missing.jpg")
+	}
+
+	verifyDimensions(t, img, 2*TILE_SIZE, 2*TILE_SIZE)
+	verifyJPG(t, img, "test_data/output/test_missing.jpg")
+}
+
+func Test_Merge_Background(t *testing.T) {
+	tiles := jpgTiles()
+	// remove a tile's data
+	tiles.Tiles[0].Data = nil
+	img, err := Merge(tiles, 0, 0, 2*TILE_SIZE, 2*TILE_SIZE, color.RGBA{uint8(255), uint8(0), uint8(0), uint8(255)})
+	if err != nil {
+		panic(err)
+	}
+
+	if *update {
+		exportJPG(img, "test_data/output/test_background.jpg")
+	}
+
+	verifyDimensions(t, img, 2*TILE_SIZE, 2*TILE_SIZE)
+	verifyJPG(t, img, "test_data/output/test_background.jpg")
 }

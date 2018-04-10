@@ -1,3 +1,8 @@
+[![GoDoc](https://godoc.org/github.com/brendan-ward/tilemerge?status.svg)](https://godoc.org/github.com/brendan-ward/tilemerge)
+[![Build Status](https://travis-ci.org/brendan-ward/tilemerge.svg?branch=master)](https://travis-ci.org/brendan-ward/tilemerge)
+[![Coverage Status](https://coveralls.io/repos/github/brendan-ward/tilemerge/badge.svg?branch=master)](https://coveralls.io/github/brendan-ward/tilemerge?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/brendan-ward/tilemerge)](https://goreportcard.com/report/github.com/brendan-ward/tilemerge)
+
 # tilemerge
 Merge 2D map tiles into a single image.
 

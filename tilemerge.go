@@ -6,8 +6,8 @@ import (
 	"image/color"
 	"image/draw"
 
-	_ "image/jpeg"
-	_ "image/png"
+	_ "image/jpeg" // load jpeg decoder
+	_ "image/png"  // load png decoder
 )
 
 // TILE_SIZE uses default size of map tiles for now
@@ -34,10 +34,14 @@ type Tiles struct {
 // Any tile that
 func Merge(tiles Tiles, xOff, yOff, width, height int, bg color.Color) (image.Image, error) {
 
-	// TODO: fill with background color.  Is this needed for transparency?
 	img := image.NewRGBA(image.Rect(0, 0,
 		(tiles.X1-tiles.X0+1)*TILE_SIZE,
 		(tiles.Y1-tiles.Y0+1)*TILE_SIZE))
+
+	if bg != nil {
+		// Fill background color
+		draw.Draw(img, img.Bounds(), &image.Uniform{bg}, image.ZP, draw.Src)
+	}
 
 	// tile transform is x = (tile.X - x0) * TILE_SIZE, y = (tile.Y - y) * TILE_SIZE
 	for _, tile := range tiles.Tiles {
