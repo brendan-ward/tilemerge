@@ -17,13 +17,18 @@ A common use case is to create a static map image from an interactive Leaflet.
 
 
 ## TODO:
-* [ ] Handle anti-meridian wrapping
-* [ ] Flag for test to update golden files
-* [ ] Test with transparency
-* [ ] Test with missing tiles
+* [ ] Handle anti-meridian wrapping and several world-widths
+* [ ] Handle negative offets and width / height larger than tiles
+* [x] Flag for test to update golden files
+* [x] Test with transparency
+* [x] Test with missing tiles
 * [ ] Test with paletted PNGs
+* [ ] Test with webp tiles
 * [ ] Documentation
 
+
+## Dependencies
+Dependencies are managed using [`dep`](https://golang.github.io/dep/docs/installation.html)
 
 
 ## Similar libraries

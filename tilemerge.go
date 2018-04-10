@@ -8,6 +8,8 @@ import (
 
 	_ "image/jpeg" // load jpeg decoder
 	_ "image/png"  // load png decoder
+
+	_ "golang.org/x/image/webp" //load webp decoder
 )
 
 // TILE_SIZE uses default size of map tiles for now
