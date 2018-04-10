@@ -1,5 +1,7 @@
 # tilemerge
-Merge 2D map tiles into a single image
+Merge 2D map tiles into a single image.
+
+**Requires Go 1.9+**
 
 *Under heavy development!*
 

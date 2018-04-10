@@ -2,6 +2,7 @@ package tilemerge
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -76,8 +77,6 @@ func verifyJPG(t *testing.T, img image.Image, goldenPath string) {
 	jpeg.Encode(out, img, &jpeg.Options{Quality: JPG_QUALITY})
 
 	if !bytes.Equal(out.Bytes(), *goldenBytes) {
-		t.Logf("\noutput: %v bytes\n%v", len(out.Bytes()), out.Bytes()[:100])
-		t.Logf("\ngolden: %v bytes \n%v\n", len(*goldenBytes), (*goldenBytes)[:100])
 		t.Error("Merge() did not produce expected output; please verify image manually")
 	}
 }
@@ -93,6 +92,8 @@ func verifyDimensions(t *testing.T, img image.Image, width, height int) {
 	}
 }
 
+var update = flag.Bool("update", false, "update trusted output files")
+
 func Test_Merge(t *testing.T) {
 	tiles := jpgTiles()
 	img, err := Merge(tiles, 0, 0, 2*TILE_SIZE, 2*TILE_SIZE, nil)
@@ -100,8 +101,9 @@ func Test_Merge(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_merge.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_merge.jpg")
+	}
 
 	verifyDimensions(t, img, 2*TILE_SIZE, 2*TILE_SIZE)
 	verifyJPG(t, img, "test_data/output/test_merge.jpg")
@@ -119,8 +121,9 @@ func Test_Merge_xOff(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_xOff.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_xOff.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_xOff.jpg")
@@ -138,8 +141,9 @@ func Test_Merge_yOff(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_yOff.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_yOff.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_yOff.jpg")
@@ -158,8 +162,9 @@ func Test_Merge_xOff_yOff(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_xOff_yOff.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_xOff_yOff.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_xOff_yOff.jpg")
@@ -177,8 +182,9 @@ func Test_Merge_width(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_width.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_width.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_width.jpg")
@@ -196,8 +202,9 @@ func Test_Merge_height(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_height.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_height.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_height.jpg")
@@ -215,8 +222,9 @@ func Test_Merge_width_height(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_width_height.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_width_height.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_width_height.jpg")
@@ -234,8 +242,9 @@ func Test_Merge_crop(t *testing.T) {
 		panic(err)
 	}
 
-	// verify output manually:
-	// exportJPG(img, "/tmp/test_crop.jpg")
+	if *update {
+		exportJPG(img, "test_data/output/test_crop.jpg")
+	}
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_crop.jpg")
