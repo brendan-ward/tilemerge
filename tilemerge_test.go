@@ -189,6 +189,26 @@ func Test_Merge_xOff(t *testing.T) {
 	verifyJPG(t, img, "test_data/output/test_xOff.jpg")
 }
 
+func Test_Merge_negative_xOff(t *testing.T) {
+	tiles := jpgTiles()
+	xOff := -100
+	yOff := 0
+	width := 2 * TILE_SIZE
+	height := 2*TILE_SIZE - yOff
+
+	img, err := Merge(tiles, xOff, yOff, width, height, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	if *update {
+		exportJPG(img, "test_data/output/test_negative_xOff.jpg")
+	}
+
+	verifyDimensions(t, img, width, height)
+	verifyJPG(t, img, "test_data/output/test_negative_xOff.jpg")
+}
+
 func Test_Merge_yOff(t *testing.T) {
 	tiles := jpgTiles()
 	xOff := 0
@@ -308,6 +328,27 @@ func Test_Merge_crop(t *testing.T) {
 
 	verifyDimensions(t, img, width, height)
 	verifyJPG(t, img, "test_data/output/test_crop.jpg")
+}
+
+// Request a larger image than we have tiles to fill it
+func Test_Merge_expand(t *testing.T) {
+	tiles := jpgTiles()
+	xOff := -100
+	yOff := -50
+	width := 2*TILE_SIZE + 175  // should extend 75 px to the right of tiles
+	height := 2*TILE_SIZE + 175 // should expand 125 px to the bottom of tiles
+
+	img, err := Merge(tiles, xOff, yOff, width, height, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	if *update {
+		exportJPG(img, "test_data/output/test_expand.jpg")
+	}
+
+	verifyDimensions(t, img, width, height)
+	verifyJPG(t, img, "test_data/output/test_expand.jpg")
 }
 
 func Test_Merge_Missing_Tile(t *testing.T) {
